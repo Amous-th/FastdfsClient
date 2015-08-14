@@ -190,6 +190,37 @@ public class FastdfsClientImpl implements FastdfsClient{
 		String fileName = file.getName();
 		return upload(file, fileName);
 	}
+	
+	public String upload(byte[] bytes,String fileName) throws Exception{
+		String trackerAddr = getTrackerAddr();
+		TrackerClient trackerClient = null;
+		StorageClient storageClient = null;
+		String storageAddr = null;
+		String fileId = null;
+		try {
+			trackerClient = trackerClientPool.borrowObject(trackerAddr);
+			Result<UploadStorage> result = trackerClient.getUploadStorage();
+			if(result.getCode()==0){
+				storageAddr = result.getData().getAddress();
+				storageClient = storageClientPool.borrowObject(storageAddr);
+				Result<String> result2 = storageClient.upload(bytes, fileName, result.getData().getPathIndex());
+				if(result2.getCode()==0){
+					fileId = result2.getData();
+				}
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			throw e;
+		} finally {
+			if(storageClient!=null){
+				storageClientPool.returnObject(storageAddr, storageClient);
+			}
+			if(trackerClient!=null){
+				trackerClientPool.returnObject(trackerAddr, trackerClient);
+			}
+		}
+		return fileId;
+	}
 
 	public String upload(File file,String fileName) throws Exception{
 		String trackerAddr = getTrackerAddr();

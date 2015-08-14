@@ -10,10 +10,12 @@ import net.mikesu.fastdfs.FastdfsClientConfig;
 import net.mikesu.fastdfs.command.CloseCmd;
 import net.mikesu.fastdfs.command.Command;
 import net.mikesu.fastdfs.command.DeleteCmd;
+import net.mikesu.fastdfs.command.FileUploadCmd;
 import net.mikesu.fastdfs.command.GetMetaDataCmd;
 import net.mikesu.fastdfs.command.SetMetaDataCmd;
-import net.mikesu.fastdfs.command.UploadCmd;
+import net.mikesu.fastdfs.command.SimpleUploadCmd;
 import net.mikesu.fastdfs.data.Result;
+import net.mikesu.fastdfs.exception.FastdfsIOException;
 
 public class StorageClientImpl implements StorageClient{
 	
@@ -55,7 +57,7 @@ public class StorageClientImpl implements StorageClient{
 
 	public Result<String> upload(File file,String fileName,byte storePathIndex) throws IOException{
 		Socket socket = getSocket();
-		UploadCmd uploadCmd = new UploadCmd(file, fileName,storePathIndex);
+		FileUploadCmd uploadCmd = new FileUploadCmd(file, fileName,storePathIndex);
 		return uploadCmd.exec(socket);
 	}
 	
@@ -79,6 +81,17 @@ public class StorageClientImpl implements StorageClient{
 		Socket socket = getSocket();
 		GetMetaDataCmd getMetaDataCmd = new GetMetaDataCmd(group, fileName);
 		return getMetaDataCmd.exec(socket);
+	}
+
+	@Override
+	public Result<String> upload(byte[] bytes, String fileName,
+			byte storePathIndex) throws IOException {
+		if(bytes==null||bytes.length<1){
+			throw new IOException("upload bytes of "+fileName+" bytes null");
+		}
+		Socket socket = getSocket();
+		SimpleUploadCmd uploadCmd = new SimpleUploadCmd(bytes, fileName,storePathIndex);
+		return uploadCmd.exec(socket);
 	}
 
 }
