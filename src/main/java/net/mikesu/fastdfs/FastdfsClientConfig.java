@@ -15,20 +15,27 @@ public class FastdfsClientConfig {
 	
 	private int connectTimeout = DEFAULT_CONNECT_TIMEOUT * 1000;
 	private int networkTimeout = DEFAULT_NETWORK_TIMEOUT * 1000;
+	
+	private int maxTotal = 20;
+	
+	private boolean testOnBorrow = false;
+	
+	private int maxWaitMillis = connectTimeout;
+	
 	private List<String> trackerAddrs = new ArrayList<String>();
-//	private int trackerClientPoolMaxIdlePerKey = 
 	
 	public FastdfsClientConfig() {
-		super();
-		// TODO Auto-generated constructor stub
+		
 	}
 	
-	public FastdfsClientConfig(String configFile) throws ConfigurationException {
-		super();
-//		String conf = FastdfsClientConfig.class.getClassLoader().getResource(configFile).getPath();
-		Configuration config = new PropertiesConfiguration(configFile);
-		this.connectTimeout = config.getInt("connect_timeout", DEFAULT_CONNECT_TIMEOUT)*1000;
-		this.networkTimeout = config.getInt("network_timeout", DEFAULT_NETWORK_TIMEOUT)*1000;
+	public FastdfsClientConfig(String confFile) throws ConfigurationException {
+		if(confFile.startsWith("classpath:")){
+			confFile = confFile.substring(10);
+		}
+		Configuration config = new PropertiesConfiguration(confFile);
+		this.connectTimeout = config.getInt("connectTimeout", DEFAULT_CONNECT_TIMEOUT)*1000;
+		this.networkTimeout = config.getInt("connectTimeout", DEFAULT_NETWORK_TIMEOUT)*1000;
+		//TODO
 		List<Object> trackerServers = config.getList("tracker_server");
 		for(Object trackerServer:trackerServers){
 			trackerAddrs.add((String)trackerServer);
@@ -58,22 +65,46 @@ public class FastdfsClientConfig {
 	public void setTrackerAddrs(List<String> trackerAddrs) {
 		this.trackerAddrs = trackerAddrs;
 	}
+	
+	private GenericKeyedObjectPoolConfig createPool(){
+		GenericKeyedObjectPoolConfig poolConfig = new GenericKeyedObjectPoolConfig();
+		poolConfig.setMaxTotal(maxTotal);
+		poolConfig.setJmxEnabled(false);
+		poolConfig.setTestOnBorrow(testOnBorrow);
+		poolConfig.setMaxWaitMillis(maxWaitMillis);
+		return poolConfig;
+	}
 
 	public GenericKeyedObjectPoolConfig getTrackerClientPoolConfig(){
-		GenericKeyedObjectPoolConfig poolConfig = new GenericKeyedObjectPoolConfig();
-//		poolConfig.setMaxIdlePerKey(maxIdlePerKey);
-//		poolConfig.setMaxTotal(maxTotal);
-//		poolConfig.setMaxTotalPerKey(maxTotalPerKey);
-//		poolConfig.setMinEvictableIdleTimeMillis(minEvictableIdleTimeMillis);
-//		poolConfig.setma
-		
-		return poolConfig;
+		return this.createPool();
 	}
 	
 
 	public GenericKeyedObjectPoolConfig getStorageClientPoolConfig(){
-		GenericKeyedObjectPoolConfig poolConfig = new GenericKeyedObjectPoolConfig();
-		return poolConfig;
+		return this.createPool();
 	}
 
+	public int getMaxTotal() {
+		return maxTotal;
+	}
+
+	public void setMaxTotal(int maxTotal) {
+		this.maxTotal = maxTotal;
+	}
+
+	public boolean isTestOnBorrow() {
+		return testOnBorrow;
+	}
+
+	public void setTestOnBorrow(boolean testOnBorrow) {
+		this.testOnBorrow = testOnBorrow;
+	}
+
+	public int getMaxWaitMillis() {
+		return maxWaitMillis;
+	}
+
+	public void setMaxWaitMillis(int maxWaitMillis) {
+		this.maxWaitMillis = maxWaitMillis;
+	}
 }
