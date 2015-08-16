@@ -1,6 +1,6 @@
 #fastdfs客户端
 
-* 增加连接池支持
+* 连接池增加可配置参数
 * 上传bytes支持
 * 增加上传group支持
 * 修复tracker list storage协议问题
