@@ -4,6 +4,7 @@ public class UploadStorage {
 	
 	private String address;
 	private byte pathIndex;
+	
 	public UploadStorage(String address, byte pathIndex) {
 		super();
 		this.address = address;

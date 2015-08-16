@@ -1,6 +1,9 @@
 package net.mikesu.fastdfs;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -24,6 +27,14 @@ public class MultiThreadUploadTest {
 	private AtomicLong totalCost = new AtomicLong();
 	private AtomicLong totalUploadCount = new AtomicLong();
 	private CountDownLatch latch;
+	
+	private byte[] readFile(File file) throws IOException{
+		byte[] buf = new byte[(int)file.length()];
+		FileInputStream fis = new FileInputStream(file);
+		fis.read(buf);
+		fis.close();
+		return buf;
+	}
 	
 	public void start(){
 		int c = 0;
@@ -67,8 +78,11 @@ public class MultiThreadUploadTest {
 					String f = imgs[index.incrementAndGet()%imgs.length];
 					File file = new File(prefix+f);
 					if(file.exists()){
+						byte[] bs = readFile(file);
 						long start = System.currentTimeMillis();
-						String upload = client.upload(file);
+//						client.upload(file);
+//						client.upload(file, f, "group1");
+						String upload = client.upload(bs, file.getName(),"group2");
 						System.out.println(upload+" source:"+f);
 						long end = System.currentTimeMillis();
 						totalCost.addAndGet(end-start);
@@ -90,9 +104,9 @@ public class MultiThreadUploadTest {
 	public static void main(String[] args) throws ConfigurationException {
 		FastdfsClient fastdfsClient = FastdfsClientFactory.getFastdfsClient("FastdfsClient.properties");
 		MultiThreadUploadTest test = new MultiThreadUploadTest();
-		test.time = 500;
+		test.time = 10;
 		test.interval = 100;
-		test.threadCount = 5;
+		test.threadCount = 1;
 		test.client = fastdfsClient;
 		test.start();
 		test.waitForFinish();

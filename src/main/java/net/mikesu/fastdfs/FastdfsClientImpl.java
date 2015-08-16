@@ -221,6 +221,97 @@ public class FastdfsClientImpl implements FastdfsClient{
 		}
 		return fileId;
 	}
+	
+	@Override
+	public String upload(byte[] bytes, String fileName, String group)
+			throws Exception {
+		String fileId = null;
+		StorageClient storageClient = null;
+		StoragePath storePath= null;
+		try {
+			storePath = this.getStoreIp(group);
+			if(storePath!=null){
+				storageClient = storageClientPool.borrowObject(storePath.store);
+				Result<String> result = storageClient.upload(bytes, fileName, (byte)storePath.path);
+				if(result.getCode()==0){
+					fileId = result.getData();
+				}
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			throw e;
+		} finally {
+			if(storageClient!=null){
+				storageClientPool.returnObject(storePath.store, storageClient);
+			}
+		}
+		return fileId;
+	}
+	
+	private class StoragePath{
+		private String store;
+		private int path;
+	}
+	
+	private StoragePath getStoreIp(String group) throws Exception{
+		String trackerAddr = getTrackerAddr();
+		TrackerClient trackerClient = null;
+		try{
+			trackerClient = trackerClientPool.borrowObject(trackerAddr);
+			Result<List<StorageInfo>> storageInfos = trackerClient.getStorageInfos(group);
+			if(storageInfos.getCode()==0){
+				List<StorageInfo> list = storageInfos.getData();
+				if(list!=null&&list.size()>0){
+					Random random = new Random();
+					int size = list.size();
+					int haha = random.nextInt(size);
+					int index = haha%size;
+					StorageInfo info = list.get(index);
+					
+					String ipAddr = info.getIpAddr();
+					int port = info.getStoragePort();
+					StoragePath storagePath = new StoragePath();
+					storagePath.store = ipAddr+":"+port;
+					storagePath.path = random.nextInt(info.getStorePathCount());
+					return storagePath;
+				}
+			}
+		}catch(Exception e){
+			logger.error(e.getMessage());
+			throw e;
+		}finally{
+			if(trackerClient!=null){
+				trackerClientPool.returnObject(trackerAddr, trackerClient);
+			}
+		}
+		return null;
+	}
+	
+	@Override
+	public String upload(File file, String fileName, String group)
+			throws Exception {
+		String fileId = null;
+		StorageClient storageClient = null;
+		StoragePath storeIp = null;
+		try {
+			storeIp = this.getStoreIp(group);
+			if(storeIp!=null){
+				storageClient = storageClientPool.borrowObject(storeIp.store);
+				Result<String> result = storageClient.upload(file, fileName, (byte)storeIp.path);
+				if(result.getCode()==0){
+					fileId = result.getData();
+				}
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			throw e;
+		} finally {
+			if(storageClient!=null){
+				storageClientPool.returnObject(storeIp.store, storageClient);
+			}
+		}
+		return fileId;
+	}
 
 	public String upload(File file,String fileName) throws Exception{
 		String trackerAddr = getTrackerAddr();
@@ -303,6 +394,5 @@ public class FastdfsClientImpl implements FastdfsClient{
 		}
 		
 	}
-	
 
 }

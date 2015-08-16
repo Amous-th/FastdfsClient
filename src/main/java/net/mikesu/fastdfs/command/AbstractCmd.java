@@ -121,6 +121,27 @@ public abstract class AbstractCmd<T> implements Command<T> {
 		return bs;
 	}
 	
+	public static byte[] int2buff(int n) {
+		byte[] bs;
+
+		bs = new byte[8];
+		bs[0] = (byte) ((n >> 56) & 0xFF);
+		bs[1] = (byte) ((n >> 48) & 0xFF);
+		bs[2] = (byte) ((n >> 40) & 0xFF);
+		bs[3] = (byte) ((n >> 32) & 0xFF);
+		return bs;
+	}
+	
+	public static long buff2int(byte[] bs, int offset) {
+		return (((long) (bs[offset] >= 0 ? bs[offset] : 256 + bs[offset])) << 56)
+				| (((long) (bs[offset + 1] >= 0 ? bs[offset + 1]
+						: 256 + bs[offset + 1])) << 48)
+				| (((long) (bs[offset + 2] >= 0 ? bs[offset + 2]
+						: 256 + bs[offset + 2])) << 40)
+				| (((long) (bs[offset + 3] >= 0 ? bs[offset + 3]
+						: 256 + bs[offset + 3])) << 32);
+	}
+	
 	public static long buff2long(byte[] bs, int offset) {
 		return (((long) (bs[offset] >= 0 ? bs[offset] : 256 + bs[offset])) << 56)
 				| (((long) (bs[offset + 1] >= 0 ? bs[offset + 1]

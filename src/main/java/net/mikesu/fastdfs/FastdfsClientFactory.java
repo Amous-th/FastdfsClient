@@ -18,7 +18,7 @@ public class FastdfsClientFactory {
 	public static FastdfsClient getFastdfsClient(List<String> trackerAddrs){
 		FastdfsClientConfig config = new FastdfsClientConfig();
 		config.setTrackerAddrs(trackerAddrs);
-		return getFastdfsClient(new FastdfsClientConfig());
+		return getFastdfsClient(config);
 	}
 	
 	public static FastdfsClient getFastdfsClient(String configFileName) throws ConfigurationException{

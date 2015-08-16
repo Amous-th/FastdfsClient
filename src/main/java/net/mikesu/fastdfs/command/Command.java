@@ -57,6 +57,7 @@ public interface Command<T> {
 	 */
 	public static final byte STORAGE_SET_METADATA_FLAG_MERGE = 'M';
 
+	public static final int FDFS_PROTO_INT_LEN_SIZE = 4;
 	public static final int FDFS_PROTO_PKG_LEN_SIZE = 8;
 	public static final int FDFS_PROTO_CMD_SIZE = 1;
 	public static final int FDFS_GROUP_NAME_MAX_LEN = 16;

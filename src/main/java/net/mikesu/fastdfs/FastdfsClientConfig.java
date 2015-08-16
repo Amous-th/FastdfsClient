@@ -13,14 +13,16 @@ public class FastdfsClientConfig {
 	public static final int DEFAULT_CONNECT_TIMEOUT = 5; // second
 	public static final int DEFAULT_NETWORK_TIMEOUT = 30; // second
 	
+	public static final int DEFAULT_MAX_TOTAL = 20;
+	
 	private int connectTimeout = DEFAULT_CONNECT_TIMEOUT * 1000;
 	private int networkTimeout = DEFAULT_NETWORK_TIMEOUT * 1000;
 	
-	private int maxTotal = 20;
+	private int maxTotal = DEFAULT_MAX_TOTAL;
 	
 	private boolean testOnBorrow = false;
 	
-	private int maxWaitMillis = connectTimeout;
+	private int maxWait = connectTimeout;
 	
 	private List<String> trackerAddrs = new ArrayList<String>();
 	
@@ -33,10 +35,13 @@ public class FastdfsClientConfig {
 			confFile = confFile.substring(10);
 		}
 		Configuration config = new PropertiesConfiguration(confFile);
+		
 		this.connectTimeout = config.getInt("connectTimeout", DEFAULT_CONNECT_TIMEOUT)*1000;
 		this.networkTimeout = config.getInt("connectTimeout", DEFAULT_NETWORK_TIMEOUT)*1000;
-		//TODO
-		List<Object> trackerServers = config.getList("tracker_server");
+		this.maxWait = config.getInt("maxWait", DEFAULT_NETWORK_TIMEOUT)*1000;
+		this.maxTotal = config.getInt("maxTotal",DEFAULT_MAX_TOTAL);
+		this.testOnBorrow = config.getBoolean("testOnBorrow", false);
+		List<Object> trackerServers = config.getList("trackerAddrs");
 		for(Object trackerServer:trackerServers){
 			trackerAddrs.add((String)trackerServer);
 		}
@@ -71,7 +76,7 @@ public class FastdfsClientConfig {
 		poolConfig.setMaxTotal(maxTotal);
 		poolConfig.setJmxEnabled(false);
 		poolConfig.setTestOnBorrow(testOnBorrow);
-		poolConfig.setMaxWaitMillis(maxWaitMillis);
+		poolConfig.setMaxWaitMillis(maxWait);
 		return poolConfig;
 	}
 
@@ -101,10 +106,10 @@ public class FastdfsClientConfig {
 	}
 
 	public int getMaxWaitMillis() {
-		return maxWaitMillis;
+		return maxWait;
 	}
 
 	public void setMaxWaitMillis(int maxWaitMillis) {
-		this.maxWaitMillis = maxWaitMillis;
+		this.maxWait = maxWaitMillis;
 	}
 }
