@@ -397,13 +397,25 @@ public class FastdfsClientImpl implements FastdfsClient{
 	}
 	
 	public String[] splitFile(String fileId) {
-		int pos = fileId.indexOf("/");
-		if ((pos <= 0) || (pos == fileId.length() - 1)) {
-			return null;
-		}
+		//修正从第一个开始
 		String[] strs = new String[2];
-		strs[0] = fileId.substring(0, pos); // group name
-		strs[1] = fileId.substring(pos + 1); // file name
+		if(fileId.startsWith("/")){
+			int pos = fileId.indexOf("/", 1);
+			if(pos>0){
+				strs[0] = fileId.substring(1, pos); // group name
+				strs[1] = fileId.substring(pos + 1); // file name
+			}else{
+				return null;
+			}
+		}else{
+			int pos = fileId.indexOf("/");
+			if(pos>0){
+				strs[0] = fileId.substring(0, pos); // group name
+				strs[1] = fileId.substring(pos + 1); // file name
+			}else{
+				return null;
+			}
+		}
 		return strs;
 	}
 
@@ -459,5 +471,5 @@ public class FastdfsClientImpl implements FastdfsClient{
 		}
 		return false;
 	}
-
+	
 }
