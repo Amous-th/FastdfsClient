@@ -1,6 +1,7 @@
 package net.mikesu.fastdfs;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +12,7 @@ import net.mikesu.fastdfs.client.StorageClient;
 import net.mikesu.fastdfs.client.StorageClientFactory;
 import net.mikesu.fastdfs.client.TrackerClient;
 import net.mikesu.fastdfs.client.TrackerClientFactory;
+import net.mikesu.fastdfs.data.DownloadResult;
 import net.mikesu.fastdfs.data.GroupInfo;
 import net.mikesu.fastdfs.data.Result;
 import net.mikesu.fastdfs.data.StorageInfo;
@@ -358,7 +360,7 @@ public class FastdfsClientImpl implements FastdfsClient{
 				storageAddr = result2.getData();
 				storageClient = storageClientPool.borrowObject(storageAddr);
 				Result<Boolean> result3 = storageClient.delete(fastDfsFile.group, fastDfsFile.fileName);
-				if(result3.getCode()==0||result3.getCode()==0){
+				if(result3.getCode()==0){
 					result = true;
 				}
 			}
@@ -392,7 +394,70 @@ public class FastdfsClientImpl implements FastdfsClient{
 			group = fileId.substring(0, pos);
 			fileName = fileId.substring(pos+1);
 		}
+	}
+	
+	public String[] splitFile(String fileId) {
+		int pos = fileId.indexOf("/");
+		if ((pos <= 0) || (pos == fileId.length() - 1)) {
+			return null;
+		}
+		String[] strs = new String[2];
+		strs[0] = fileId.substring(0, pos); // group name
+		strs[1] = fileId.substring(pos + 1); // file name
+		return strs;
+	}
+
+	@Override
+	public byte[] download(String fileId) throws Exception {
+		String[] gf = this.splitFile(fileId);
+		if(gf!=null){
+			String group = gf[0];
+			String fileName = gf[1];
+			StorageClient storageClient = null;
+			StoragePath storeIp = null;
+			try {
+				storeIp = this.getStoreIp(group);
+				if(storeIp!=null){
+					storageClient = storageClientPool.borrowObject(storeIp.store);
+					Result<DownloadResult> result = storageClient.download(group, fileName);
+					if(result.getCode()==0){
+						return result.getData().getData();
+					}
+				}
+			} catch (Exception e) {
+				logger.error(e.getMessage());
+				throw e;
+			} finally {
+				if(storageClient!=null){
+					storageClientPool.returnObject(storeIp.store, storageClient);
+				}
+			}
+		}
+		return null;
+	}
+
+	@SuppressWarnings("resource")
+	@Override
+	public boolean transferTo(String fileId, File file) throws Exception {
+		File parent = file.getParentFile();
+		if(file.exists()){
+			logger.error("file already exist:"+file.getAbsolutePath());
+			return false;
+		}
+		if(!parent.exists()){
+			parent.mkdirs();
+		}
 		
+		if(file.createNewFile()){
+			byte[] download = this.download(fileId);
+			FileOutputStream fos = new FileOutputStream(file);
+			fos.write(download);
+			fos.close();
+			return true;
+		}else{
+			logger.error("create file :"+file.getAbsolutePath()+" error");
+		}
+		return false;
 	}
 
 }

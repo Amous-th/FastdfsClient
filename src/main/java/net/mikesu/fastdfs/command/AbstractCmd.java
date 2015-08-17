@@ -39,10 +39,13 @@ public abstract class AbstractCmd<T> implements Command<T> {
 		byte[] header = new byte[FDFS_PROTO_PKG_LEN_SIZE + 2 + body1.length];
 		Arrays.fill(header, (byte) 0);
 		byte[] hex_len = long2buff(body1.length+body2Len);
+		//–¥head≥§∂»
 		System.arraycopy(hex_len, 0, header, 0, hex_len.length);
-		System.arraycopy(body1, 0, header, FDFS_PROTO_PKG_LEN_SIZE + 2, body1.length);
+		//–¥√¸¡Ó
 		header[PROTO_HEADER_CMD_INDEX] = requestCmd;
 		header[PROTO_HEADER_STATUS_INDEX] = (byte) 0;
+		//copy body
+		System.arraycopy(body1, 0, header, FDFS_PROTO_PKG_LEN_SIZE + 2, body1.length);
 		return header;
 	}
 	

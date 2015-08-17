@@ -23,6 +23,23 @@ public interface FastdfsClient {
 	
 	public Boolean delete(String fileId) throws Exception;
 	
+	/**
+	 * 
+	 * @param fileId:group2/M01/00/08/wKiLhFXOppGAO0FZAAPWNDHeYj4609.jpg
+	 * @return 必须这种格式fileId
+	 * @throws Exception
+	 */
+	public byte[] download(String fileId) throws Exception;
+	
+	/**
+	 * 先下载，然后保存在本地
+	 * @param fileId
+	 * @param file
+	 * @return
+	 * @throws Exception
+	 */
+	public boolean transferTo(String fileId,File file) throws Exception;
+	
 	public void close();
 
 }
