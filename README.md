@@ -4,7 +4,7 @@
 * 上传bytes支持
 * 增加上传group支持
 * 修复tracker list storage协议问题
-
+* 增加通过fileId下载file api
 
 >api列表
 
@@ -28,6 +28,10 @@ public interface FastdfsClient {
 	public Map<String,String> getMeta(String fileId) throws Exception;
 	
 	public Boolean delete(String fileId) throws Exception;
+	
+	public byte[] download(String fileId) throws Exception;
+		
+	public boolean transferTo(String fileId,File file) throws Exception;
 	
 	public void close();
 
