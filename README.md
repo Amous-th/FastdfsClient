@@ -5,6 +5,7 @@
 * 增加上传group支持
 * 修复tracker list storage协议问题
 * 增加通过fileId下载file api
+* 增加上传文件slave支持
 
 >api列表
 
@@ -32,6 +33,10 @@ public interface FastdfsClient {
 	public byte[] download(String fileId) throws Exception;
 		
 	public boolean transferTo(String fileId,File file) throws Exception;
+	
+	public String uploadSlave(String fileId,File file,String suffix) throws Exception;
+	
+	public String uploadSlave(String fileId,byte[] bytes,String suffix) throws Exception;
 	
 	public void close();
 
