@@ -1,6 +1,7 @@
 package net.mikesu.fastdfs;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -470,6 +471,74 @@ public class FastdfsClientImpl implements FastdfsClient{
 			logger.error("create file :"+file.getAbsolutePath()+" error");
 		}
 		return false;
+	}
+
+	@Override
+	public String uploadSlave(String fileId, File file, String suffix) throws Exception {
+		String[] gf = this.splitFile(fileId);
+		if(gf!=null){
+			String group = gf[0];
+			String fileName = gf[1];
+			String ext = "bak";
+			int idx = fileName.lastIndexOf('.');
+			if(idx>0){
+				ext = fileName.substring(idx+1);
+			}
+			StorageClient storageClient = null;
+			StoragePath storeIp = null;
+			try {
+				storeIp = this.getStoreIp(group);
+				if(storeIp!=null){
+					storageClient = storageClientPool.borrowObject(storeIp.store);
+					Result<String> result = storageClient.uploadSlave(file, fileName, suffix, ext);
+					if(result.getCode()==0){
+						return result.getData();
+					}
+				}
+			} catch (Exception e) {
+				logger.error(e.getMessage());
+				throw e;
+			} finally {
+				if(storageClient!=null){
+					storageClientPool.returnObject(storeIp.store, storageClient);
+				}
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public String uploadSlave(String fileId, byte[] bytes, String suffix) throws Exception {
+		String[] gf = this.splitFile(fileId);
+		if(gf!=null){
+			String group = gf[0];
+			String fileName = gf[1];
+			String ext = "bak";
+			int idx = fileName.lastIndexOf('.');
+			if(idx>0){
+				ext = fileName.substring(idx+1);
+			}
+			StorageClient storageClient = null;
+			StoragePath storeIp = null;
+			try {
+				storeIp = this.getStoreIp(group);
+				if(storeIp!=null){
+					storageClient = storageClientPool.borrowObject(storeIp.store);
+					Result<String> result = storageClient.uploadSlave(bytes, fileName, suffix, ext);
+					if(result.getCode()==0){
+						return result.getData();
+					}
+				}
+			} catch (Exception e) {
+				logger.error(e.getMessage());
+				throw e;
+			} finally {
+				if(storageClient!=null){
+					storageClientPool.returnObject(storeIp.store, storageClient);
+				}
+			}
+		}
+		return null;
 	}
 	
 }

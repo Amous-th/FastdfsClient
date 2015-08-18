@@ -24,6 +24,27 @@ public interface FastdfsClient {
 	public Boolean delete(String fileId) throws Exception;
 	
 	/**
+	 * 上传文件slave支持 
+	 * group2/M02/00/08/wKiLhFXOppGALI-KAAHDfzZSW1o296.jpg
+	 * group2/M02/00/08/wKiLhFXOppGALI-KAAHDfzZSW1o296_100x200.jpg
+	 * @param fileId
+	 * @param file
+	 * @param suffix
+	 * @return
+	 * @throws Exception
+	 */
+	public String uploadSlave(String fileId,File file,String suffix) throws Exception;
+	
+	/**
+	 * 上传slave文件支持
+	 * @param fileId
+	 * @param bytes
+	 * @param suffix
+	 * @return
+	 * @throws Exception
+	 */
+	public String uploadSlave(String fileId,byte[] bytes,String suffix) throws Exception;
+	/**
 	 * 
 	 * @param fileId:group2/M01/00/08/wKiLhFXOppGAO0FZAAPWNDHeYj4609.jpg
 	 * @return 必须这种格式fileId

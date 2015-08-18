@@ -15,9 +15,9 @@ import net.mikesu.fastdfs.command.GetMetaDataCmd;
 import net.mikesu.fastdfs.command.SetMetaDataCmd;
 import net.mikesu.fastdfs.command.SimpleDownloadCmd;
 import net.mikesu.fastdfs.command.SimpleUploadCmd;
+import net.mikesu.fastdfs.command.SimpleUploadSlaveCmd;
 import net.mikesu.fastdfs.data.DownloadResult;
 import net.mikesu.fastdfs.data.Result;
-import net.mikesu.fastdfs.exception.FastdfsIOException;
 
 public class StorageClientImpl implements StorageClient{
 	
@@ -108,6 +108,22 @@ public class StorageClientImpl implements StorageClient{
 		Socket socket = getSocket();
 		SimpleDownloadCmd downloadCmd = new SimpleDownloadCmd(group, remoteFileName);
 		return downloadCmd.exec(socket);
+	}
+
+	@Override
+	public Result<String> uploadSlave(byte[] buf, String masterfileId,
+			String prefix, String ext) throws IOException {
+		SimpleUploadSlaveCmd uploadCmd = new SimpleUploadSlaveCmd(buf, masterfileId,prefix,ext);
+		Socket socket = getSocket();
+		return uploadCmd.exec(socket);
+	}
+	
+	@Override
+	public Result<String> uploadSlave(File file, String masterfileId,
+			String prefix, String ext) throws IOException {
+		SimpleUploadSlaveCmd uploadCmd = new SimpleUploadSlaveCmd(file, masterfileId,prefix,ext);
+		Socket socket = getSocket();
+		return uploadCmd.exec(socket);
 	}
 
 }

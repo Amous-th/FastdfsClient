@@ -23,4 +23,7 @@ public interface StorageClient {
 	
 	public void close() throws IOException;
 	
+	public Result<String> uploadSlave(byte[] buf, String masterfileId, String prefix, String ext) throws IOException;
+	
+	public Result<String> uploadSlave(File file, String masterfileId, String prefix, String ext) throws IOException;
 }
