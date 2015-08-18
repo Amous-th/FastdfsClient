@@ -2,9 +2,9 @@ package net.mikesu.fastdfs;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -80,9 +80,13 @@ public class MultiThreadUploadTest {
 					if(file.exists()){
 						byte[] bs = readFile(file);
 						long start = System.currentTimeMillis();
-//						client.upload(file);
+						String upload = client.upload(file);
+						HashMap<String, String> meta = new HashMap<String,String>();
+						meta.put("haha", "hahashduiw");
+						meta.put("file", f);
+						client.setMeta(upload, meta);
 //						client.upload(file, f, "group1");
-						String upload = client.upload(bs, file.getName(),"group2");
+//						String upload = client.upload(bs, file.getName(),"group2");
 						System.out.println(upload+" source:"+f);
 						long end = System.currentTimeMillis();
 						totalCost.addAndGet(end-start);
