@@ -37,7 +37,7 @@ public class FastdfsClientConfig {
 		Configuration config = new PropertiesConfiguration(confFile);
 		
 		this.connectTimeout = config.getInt("connectTimeout", DEFAULT_CONNECT_TIMEOUT)*1000;
-		this.networkTimeout = config.getInt("connectTimeout", DEFAULT_NETWORK_TIMEOUT)*1000;
+		this.networkTimeout = config.getInt("networkTimeout", DEFAULT_NETWORK_TIMEOUT)*1000;
 		this.maxWait = config.getInt("maxWait", DEFAULT_NETWORK_TIMEOUT)*1000;
 		this.maxTotal = config.getInt("maxTotal",DEFAULT_MAX_TOTAL);
 		this.testOnBorrow = config.getBoolean("testOnBorrow", false);

@@ -26,12 +26,19 @@ public class StorageClientImpl implements StorageClient{
 	private Integer port;
 	private Integer connectTimeout = FastdfsClientConfig.DEFAULT_CONNECT_TIMEOUT * 1000;
 	private Integer networkTimeout = FastdfsClientConfig.DEFAULT_NETWORK_TIMEOUT * 1000;
+	private boolean connected = false;
 	
 	private Socket getSocket() throws IOException{
 		if(socket==null){
 			socket = new Socket();
 			socket.setSoTimeout(networkTimeout);
 			socket.connect(new InetSocketAddress(host, port),connectTimeout);
+			connected = true;
+		}
+		//修复服务器或者网络抖动连接异常
+		if(!connected){
+			socket.connect(new InetSocketAddress(host, port),connectTimeout);
+			connected = true;
 		}
 		return socket;
 	}
