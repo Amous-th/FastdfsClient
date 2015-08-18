@@ -33,7 +33,7 @@ public interface FastdfsClient {
 	 * @return
 	 * @throws Exception
 	 */
-	public String uploadSlave(String fileId,File file,String suffix) throws Exception;
+	public String uploadSlave(String fileId,File file,String suffix,String ext) throws Exception;
 	
 	/**
 	 * 上传slave文件支持
@@ -43,7 +43,7 @@ public interface FastdfsClient {
 	 * @return
 	 * @throws Exception
 	 */
-	public String uploadSlave(String fileId,byte[] bytes,String suffix) throws Exception;
+	public String uploadSlave(String fileId,byte[] bytes,String suffix,String ext) throws Exception;
 	/**
 	 * 
 	 * @param fileId:group2/M01/00/08/wKiLhFXOppGAO0FZAAPWNDHeYj4609.jpg

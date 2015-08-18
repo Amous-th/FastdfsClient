@@ -9,7 +9,7 @@ public class UploadSlaveTest {
 		String ff = "group2/M02/00/08/wKiLhFXOppGALI-KAAHDfzZSW1o296.jpg";
 		byte[] download = fastdfsClient.download(ff);
 		if(download!=null){
-			String slave = fastdfsClient.uploadSlave(ff, download, "_haha");
+			String slave = fastdfsClient.uploadSlave(ff, download, "_haha",null);
 			System.out.println(slave);
 		}
 		fastdfsClient.close();

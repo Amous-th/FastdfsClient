@@ -474,15 +474,17 @@ public class FastdfsClientImpl implements FastdfsClient{
 	}
 
 	@Override
-	public String uploadSlave(String fileId, File file, String suffix) throws Exception {
+	public String uploadSlave(String fileId, File file, String suffix,String ext) throws Exception {
 		String[] gf = this.splitFile(fileId);
 		if(gf!=null){
 			String group = gf[0];
 			String fileName = gf[1];
-			String ext = "bak";
-			int idx = fileName.lastIndexOf('.');
-			if(idx>0){
-				ext = fileName.substring(idx+1);
+			if(ext==null){
+				ext = "bak";
+				int idx = fileName.lastIndexOf('.');
+				if(idx>0){
+					ext = fileName.substring(idx+1);
+				}	
 			}
 			StorageClient storageClient = null;
 			StoragePath storeIp = null;
@@ -508,15 +510,17 @@ public class FastdfsClientImpl implements FastdfsClient{
 	}
 
 	@Override
-	public String uploadSlave(String fileId, byte[] bytes, String suffix) throws Exception {
+	public String uploadSlave(String fileId, byte[] bytes, String suffix,String ext) throws Exception {
 		String[] gf = this.splitFile(fileId);
 		if(gf!=null){
 			String group = gf[0];
 			String fileName = gf[1];
-			String ext = "bak";
-			int idx = fileName.lastIndexOf('.');
-			if(idx>0){
-				ext = fileName.substring(idx+1);
+			if(ext==null){
+				ext = "bak";
+				int idx = fileName.lastIndexOf('.');
+				if(idx>0){
+					ext = fileName.substring(idx+1);
+				}	
 			}
 			StorageClient storageClient = null;
 			StoragePath storeIp = null;
