@@ -5,11 +5,14 @@ import java.io.IOException;
 import java.util.Map;
 
 import net.mikesu.fastdfs.data.DownloadResult;
+import net.mikesu.fastdfs.data.FileInfo;
 import net.mikesu.fastdfs.data.Result;
 
 public interface StorageClient {
 	
 	public Result<DownloadResult> download(String group,String remoteFileName) throws IOException;
+	
+	public Result<FileInfo> queryFileInfo(String group,String remoteFileName) throws IOException;
 	
 	public Result<String> upload(File file,String fileName,byte storePathIndex) throws IOException;
 	

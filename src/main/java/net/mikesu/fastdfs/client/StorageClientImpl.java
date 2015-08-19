@@ -12,11 +12,13 @@ import net.mikesu.fastdfs.command.Command;
 import net.mikesu.fastdfs.command.DeleteCmd;
 import net.mikesu.fastdfs.command.FileUploadCmd;
 import net.mikesu.fastdfs.command.GetMetaDataCmd;
+import net.mikesu.fastdfs.command.QueryFileInfoCmd;
 import net.mikesu.fastdfs.command.SetMetaDataCmd;
 import net.mikesu.fastdfs.command.SimpleDownloadCmd;
 import net.mikesu.fastdfs.command.SimpleUploadCmd;
 import net.mikesu.fastdfs.command.SimpleUploadSlaveCmd;
 import net.mikesu.fastdfs.data.DownloadResult;
+import net.mikesu.fastdfs.data.FileInfo;
 import net.mikesu.fastdfs.data.Result;
 
 public class StorageClientImpl implements StorageClient{
@@ -122,6 +124,14 @@ public class StorageClientImpl implements StorageClient{
 	public Result<String> uploadSlave(File file, String masterfileId,
 			String prefix, String ext) throws IOException {
 		SimpleUploadSlaveCmd uploadCmd = new SimpleUploadSlaveCmd(file, masterfileId,prefix,ext);
+		Socket socket = getSocket();
+		return uploadCmd.exec(socket);
+	}
+
+	@Override
+	public Result<FileInfo> queryFileInfo(String group, String remoteFileName)
+			throws IOException {
+		QueryFileInfoCmd uploadCmd = new QueryFileInfoCmd(group, remoteFileName);
 		Socket socket = getSocket();
 		return uploadCmd.exec(socket);
 	}

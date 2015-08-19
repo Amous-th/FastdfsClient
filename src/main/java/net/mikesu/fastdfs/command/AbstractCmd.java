@@ -135,13 +135,13 @@ public abstract class AbstractCmd<T> implements Command<T> {
 		return bs;
 	}
 	
-	public static long buff2int(byte[] bs, int offset) {
-		return (((long) (bs[offset] >= 0 ? bs[offset] : 256 + bs[offset])) << 56)
-				| (((long) (bs[offset + 1] >= 0 ? bs[offset + 1]
+	public static int buff2int(byte[] bs, int offset) {
+		return (((int) (bs[offset] >= 0 ? bs[offset] : 256 + bs[offset])) << 56)
+				| (((int) (bs[offset + 1] >= 0 ? bs[offset + 1]
 						: 256 + bs[offset + 1])) << 48)
-				| (((long) (bs[offset + 2] >= 0 ? bs[offset + 2]
+				| (((int) (bs[offset + 2] >= 0 ? bs[offset + 2]
 						: 256 + bs[offset + 2])) << 40)
-				| (((long) (bs[offset + 3] >= 0 ? bs[offset + 3]
+				| (((int) (bs[offset + 3] >= 0 ? bs[offset + 3]
 						: 256 + bs[offset + 3])) << 32);
 	}
 	
@@ -161,6 +161,22 @@ public abstract class AbstractCmd<T> implements Command<T> {
 						: 256 + bs[offset + 6])) << 8)
 				| ((long) (bs[offset + 7] >= 0 ? bs[offset + 7]
 						: 256 + bs[offset + 7]));
+	}
+	
+	public static String getIpAddress(byte[] bs, int offset) {
+		if (bs[0] == 0 || bs[3] == 0){
+			return "";
+		}
+		int n;
+		StringBuilder sbResult = new StringBuilder(16);
+		for (int i = offset; i < offset + 4; i++) {
+			n = (bs[i] >= 0) ? bs[i] : 256 + bs[i];
+			if (sbResult.length() > 0) {
+				sbResult.append(".");
+			}
+			sbResult.append(String.valueOf(n));
+		}
+		return sbResult.toString();
 	}
 	
 	protected class Response {

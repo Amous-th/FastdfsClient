@@ -3,6 +3,8 @@ package net.mikesu.fastdfs;
 import java.io.File;
 import java.util.Map;
 
+import net.mikesu.fastdfs.data.FileInfo;
+
 public interface FastdfsClient {
 	
 	public String upload(File file) throws Exception;
@@ -60,6 +62,10 @@ public interface FastdfsClient {
 	 * @throws Exception
 	 */
 	public boolean transferTo(String fileId,File file) throws Exception;
+	
+	public FileInfo getFileInfo(String fileId) throws Exception;
+	
+	public FileInfo queryFileInfo(String fileId) throws Exception;
 	
 	public void close();
 

@@ -1,19 +1,23 @@
 package net.mikesu.fastdfs;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
+import net.mikesu.fastdfs.client.Base64;
 import net.mikesu.fastdfs.client.StorageClient;
 import net.mikesu.fastdfs.client.StorageClientFactory;
 import net.mikesu.fastdfs.client.TrackerClient;
 import net.mikesu.fastdfs.client.TrackerClientFactory;
+import net.mikesu.fastdfs.command.AbstractCmd;
+import net.mikesu.fastdfs.command.Command;
 import net.mikesu.fastdfs.data.DownloadResult;
+import net.mikesu.fastdfs.data.FileInfo;
 import net.mikesu.fastdfs.data.GroupInfo;
 import net.mikesu.fastdfs.data.Result;
 import net.mikesu.fastdfs.data.StorageInfo;
@@ -30,6 +34,7 @@ public class FastdfsClientImpl implements FastdfsClient{
 	private GenericKeyedObjectPool<String, StorageClient> storageClientPool;
 	private List<String> trackerAddrs = new ArrayList<String>();
 	private Map<String,String> storageIpMap = new ConcurrentHashMap<String, String>();
+	private Base64 base64 = new Base64();
 	
 	public FastdfsClientImpl(List<String> trackerAddrs) throws Exception {
 		super();
@@ -531,6 +536,72 @@ public class FastdfsClientImpl implements FastdfsClient{
 					Result<String> result = storageClient.uploadSlave(bytes, fileName, suffix, ext);
 					if(result.getCode()==0){
 						return result.getData();
+					}
+				}
+			} catch (Exception e) {
+				logger.error(e.getMessage());
+				throw e;
+			} finally {
+				if(storageClient!=null){
+					storageClientPool.returnObject(storeIp.store, storageClient);
+				}
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public FileInfo getFileInfo(String fileId) throws Exception {
+		String[] gf = this.splitFile(fileId);
+		if (gf == null) {
+			return null;
+		}
+		if (gf[1].length() < Command.FDFS_FILE_PATH_LEN
+				+ Command.FDFS_FILENAME_BASE64_LENGTH
+				+ Command.FDFS_FILE_EXT_NAME_MAX_LEN + 1) {
+			return null;
+		}
+		byte[] buff = base64.decodeAuto(gf[1].substring(
+				Command.FDFS_FILE_PATH_LEN, Command.FDFS_FILE_PATH_LEN
+						+ Command.FDFS_FILENAME_BASE64_LENGTH));
+
+		long size = AbstractCmd.buff2long(buff, 4 * 2);
+		if (((gf[1].length() > Command.TRUNK_LOGIC_FILENAME_LENGTH) || 
+				((gf[1].length() > Command.NORMAL_LOGIC_FILENAME_LENGTH) && ((size & Command.TRUNK_FILE_MARK_SIZE) == 0)))
+				|| ((size & Command.APPENDER_FILE_SIZE) != 0)) { 
+			FileInfo fi = this.queryFileInfo(fileId);
+			if (fi == null) {
+				return null;
+			}
+			return fi;
+		}
+
+		FileInfo fileInfo = new FileInfo(size, 0, 0, AbstractCmd.getIpAddress(
+				buff, 0));
+		fileInfo.setCreateTime(new Date(AbstractCmd.buff2int(buff, 4) * 1000L));
+		if ((size >> 63) != 0) {
+			size &= 0xFFFFFFFFL;
+			fileInfo.setFileSize(size);
+		}
+		fileInfo.setCrc32(AbstractCmd.buff2int(buff, 4 * 4));
+		return fileInfo;
+	}
+
+	@Override
+	public FileInfo queryFileInfo(String fileId) throws Exception {
+		String[] gf = this.splitFile(fileId);
+		if(gf!=null){
+			String group = gf[0];
+			String fileName = gf[1];
+			StorageClient storageClient = null;
+			StoragePath storeIp = null;
+			try {
+				storeIp = this.getStoreIp(group);
+				if(storeIp!=null){
+					storageClient = storageClientPool.borrowObject(storeIp.store);
+					Result<FileInfo> fileInfo = storageClient.queryFileInfo(group, fileName);
+					if(fileInfo.getCode()==0){
+						return fileInfo.getData();
 					}
 				}
 			} catch (Exception e) {
