@@ -6,6 +6,7 @@
 * 修复tracker list storage协议问题
 * 增加通过fileId下载file api
 * 增加上传文件slave支持
+* 增加获取文件信息支持
 
 >api列表
 
@@ -37,6 +38,10 @@ public interface FastdfsClient {
 	public String uploadSlave(String fileId,File file,String suffix) throws Exception;
 	
 	public String uploadSlave(String fileId,byte[] bytes,String suffix) throws Exception;
+	
+	public FileInfo getFileInfo(String fileId) throws Exception;
+	
+	public FileInfo queryFileInfo(String fileId) throws Exception;
 	
 	public void close();
 
