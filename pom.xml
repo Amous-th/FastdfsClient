@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.mikesu</groupId>
 	<artifactId>fastdfs-client</artifactId>
-	<version>0.1.6</version>
+	<version>0.1.6-SNAPSHOT</version>
 	<name>FastDFS Java Client</name>
 	<build>
 		<resources>
@@ -45,4 +45,17 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+	
+	<distributionManagement>
+        <repository>
+            <id>releases</id>
+			<name>KuaiDaDi Releases Repository</name>
+            <url>http://10.0.50.180:8081/content/repositories/releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <name>KuaiDaDi Snapshots Repository</name>
+            <url>http://10.0.50.180:8081/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
 </project>
